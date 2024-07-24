@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import ChatRoom from "./ChatRoom";
 
 jest.mock('../utils/socket', () => ({
@@ -20,19 +20,21 @@ describe('ChatRoom', () => {
     expect(screen.getByText('Join Room')).toBeInTheDocument();
   });
 
-  it('allows joining a room', () => {
+  it('allows joining a room', async () => {
     render(<ChatRoom />);
     const usernameInput = screen.getByPlaceholderText('Enter your username');
-    const roomInput = screen.getByPlaceholderText('Enger room name');
-    const joinButton = screen.getByText('Join Room')
+    const roomInput = screen.getByPlaceholderText('Enter room name');
+    const joinButton = screen.getByText('Join Room');
 
-    fireEvent.change(usernameInput, {target: {value: 'testuser'}});
-    fireEvent.change(roomInput, {target: {value: 'testroom'}})
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+    fireEvent.change(roomInput, { target: { value: 'testroom' } });
     fireEvent.click(joinButton);
 
     const socket = require('../utils/socket').default;
-    expect(socket.emit).toHaveBeenCalledWith('joinRoom', 'testroom')
-  })
+    await waitFor(() => {
+      expect(socket.emit).toHaveBeenCalledWith('joinRoom', 'testroom');
+    });
+  });
 
   it('displays received messages', () => {
     const socket = require('../utils/socket').default;

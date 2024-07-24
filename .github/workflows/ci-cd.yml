@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install dependencies
+      run: |
+        npm run install:all
+    - name: Run server tests
+      run: |
+        cd server
+        npm run test
+        npm run test:e2e
+    - name: Run frontend tests
+      run: |
+        cd client
+        npm run test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Docker images
+      run: docker-compose build
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Deploy to production
+      run: |
+        echo "Depoying to production server"
+        # Add your deployment script here
+        # This could involve pushing to a container registry and updating your production environment
