@@ -69,3 +69,5 @@ const ChatRoom: FC = () => {
     </div>
   )
 }
+
+export default ChatRoom
