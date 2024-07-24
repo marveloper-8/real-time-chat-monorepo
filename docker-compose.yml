@@ -1,0 +1,19 @@
+version: '3'
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3001:3001"
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
